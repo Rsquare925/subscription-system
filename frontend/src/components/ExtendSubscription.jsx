@@ -8,7 +8,7 @@ function ExtendSubscription({ subscriptionId, onExtend }){
     const handleExtend = async (e) =>{
         e.preventDefault()
         try{
-            await axios.patch(apiUrl+`subscription/${subscriptionId}/extend/`, {
+            await axios.patch(apiUrl+`subscription/extend/${subscriptionId}/`, {
                 end_date: newEndDate
             })
             alert('Subscription extended successfully')

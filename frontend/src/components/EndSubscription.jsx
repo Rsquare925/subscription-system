@@ -5,11 +5,12 @@ import axios from "axios";
 function EndSubscription({ subscriptionId, onEnd }){
     const handleEnd = async () =>{
         try{
-            await axios.patch(apiUrl+`subscription/${subscriptionId}/end`)
+            await axios.patch(apiUrl+`subscription/end/${subscriptionId}/`)
+            alert('Subscription ended successfully')
+            onEnd()
         } catch(e){
             console.log(e);
             alert('Error ending subscription')
-            onEnd()
         }
     }
 

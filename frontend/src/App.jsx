@@ -1,11 +1,7 @@
-import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
-import AddSubscription from './components/AddSubscription';
-import SubscriptionList from './components/SubscriptionList';
-import RevenueReport from './components/RevenueReport';
+import { Outlet, NavLink } from 'react-router-dom';
 
 function App() {
   return (
-    <Router>
       <div className="min-h-screen flex flex-col bg-gray-50">
         <header className="bg-white shadow-md">
           <div className="max-w-7xl mx-auto px-4">
@@ -50,11 +46,8 @@ function App() {
         </header>
 
         <main className="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<SubscriptionList />} />
-            <Route path="/add" element={<AddSubscription />} />
-            <Route path="/report" element={<RevenueReport />} />
-          </Routes>
+          <Outlet></Outlet>
+
         </main>
 
         <footer className="bg-white border-t border-gray-200">
@@ -65,7 +58,6 @@ function App() {
           </div>
         </footer>
       </div>
-    </Router>
   );
 }
 

@@ -6,14 +6,15 @@ from subscription.serializers import SubscriptionSerializer, ProductSerializer, 
 from subscription.models import Subscription, Customer, Product
 from django.utils import timezone
 from django.db.models import Sum, F
+from datetime import datetime
 
 
 # Create your views here.
 @api_view(['GET'])
 def get_subscription(request):
-    subscriptions = Subscription.objects.all()
+    subscriptions = Subscription.objects.filter(end_date__gt=timezone.now().date())
     serializer = SubscriptionSerializer(subscriptions, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
     
 @api_view(['POST'])
 def add_subscription(request):
@@ -33,15 +34,21 @@ def add_subscription(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PATCH'])
-def extent_subscriptions(request, pk):
+def extent_subscriptions(request, **kwargs):
+    pk = kwargs.get("pk")
     try:
         subscription = Subscription.objects.get(pk=pk)
     except Subscription.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     new_end_date = request.data.get('end_date')
+    new_end_date = datetime.strptime(new_end_date, '%Y-%m-%d').date()
+
     if not new_end_date:
         return Response({"error": "New end date is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif new_end_date <= subscription.end_date:
+        return Response({"error": "New end date should be greater than previous end date."}, status=status.HTTP_400_BAD_REQUEST)
 
     subscription.end_date = new_end_date
     subscription.save()
@@ -50,7 +57,9 @@ def extent_subscriptions(request, pk):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['PATCH'])
-def end_subscription(request, pk):
+def end_subscription(request, **kwargs):
+    pk = kwargs.get("pk")
+    print(pk)
     try:
         subscription = Subscription.objects.get(pk=pk)
     except Subscription.DoesNotExist:
@@ -60,7 +69,7 @@ def end_subscription(request, pk):
     subscription.save()
 
     serializer = SubscriptionSerializer(subscription)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -75,10 +84,10 @@ def revenue_report(request):
 def get_customers(request):
     customers = Customer.objects.all()
     serializer = CustomerSerializer(customers, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_products(request):
     products = Product.objects.all()
     serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
